@@ -1,19 +1,19 @@
 # Матричный калькулятор, реализующий 15 функций над матрицами:
-# 1. Транспонирование матрицы (не назначено)
-# 2. Нахождение следа матрицы (не назначено)
+# 1. Транспонирование матрицы (Bebrick322)
+# 2. Нахождение следа матрицы (Stepskelet)
 # 3. Умножение матрицы на число (GroM +)
-# 4. Сложение матриц (не назначено)
-# 5. Вычитание матриц (не назначено)
+# 4. Сложение матриц (Bebrick322)
+# 5. Вычитание матриц (Stepskelet)
 # 6. Генератор матриц(единичная, нулевая, случайная, случайная-диагональная, случайная-симметричная) (GroM +)
 # 7. Экспорт в LaTeX (GroM +)
-# 8. Перемножение матриц (GroM)
-# 9. Вычисление определителя (GroM)
-# 10. Решение СЛАУ методом Гаусса (не назначено)
-# 11. Нахождение степеней матрицы (не назначено)
-# 12. Решение СЛАУ методом Крамера (не назначено)
-# 13. Нахождение обратной матрицы (не назначено)
-# 14. Решение СЛАУ матричным методом (не назначено)
-# 15. LUP разложение матрицы (не назначено)
+# 8. Перемножение матриц (GroM +)
+# 9. Вычисление определителя (GroM +)
+# 10. Решение СЛАУ методом Гаусса (Stepskelet)
+# 11. Нахождение степеней матрицы (Stepskelet)
+# 12. Решение СЛАУ методом Крамера (Bebrick322)
+# 13. Нахождение обратной матрицы (Stepskelet)
+# 14. Решение СЛАУ матричным методом (Bebrick322)
+# 15. LUP разложение матрицы (Bebrick322)
 
 from matrix_func import *
 
@@ -29,7 +29,11 @@ class IO_Unit:
             {'name': 'Сгенерировать новую матрицу',
                 'command': self.generate_matrix_cmd},
             {'name': 'Экспорт матрицы в LaTeX',
-                'command': self.export_to_latex_cmd, 'matrix_required': True}
+                'command': self.export_to_latex_cmd, 'matrix_required': True},
+            {'name': 'Перемножить матрицы', 'command': self.matrix_x_matrix_cmd,
+                'matrix_required': True},
+            {'name': 'Вычислить определитель', 'command': self.calculate_determinant_cmd,
+                'matrix_required': True, 'is_square_matrix': True},
         ]
         self.matrix = None
         self.rows, self.cols = None, None
@@ -50,6 +54,9 @@ class IO_Unit:
     def _validate_command(self, command: dict) -> bool:
         if command.get('matrix_required') is True and self.matrix is None:
             return False
+        if command.get('is_square_matrix') is True:
+            if self.matrix is None or self.rows != self.cols:
+                return False
         return True
 
     def run(self):
@@ -70,8 +77,7 @@ class IO_Unit:
         ava_commands[cmd_idx].get('command')()
 
     def create_matrix_cmd(self):
-        # Ввод размера матрицы
-        print('Введите Матрицу, над которой хотите проводить операции')
+        print('Введите новую матрицу, которая будет использоваться в операциях')
         print('Начнём с размера: введите через пробел кол-во строк и столбцов в Матрице (пр. "3 4")')
         rows, cols = 0, 0
         while True:
@@ -88,25 +94,22 @@ class IO_Unit:
                     'Некорректный ввод! Введите два целых положительных числа через пробел:')
         self.rows, self.cols = rows, cols
 
-        # Создание пустой матрицы
         self.matrix = [[None] * self.cols for _ in range(self.rows)]
-        # Заполнение матрицы значениями
         for r in range(self.rows):
             for c in range(self.cols):
                 self.draw_matrix_cmd()
                 val = self._prompt_int(
                     f'Введите значение ячейки [{r + 1}, {c + 1}]: ')
                 self.matrix[r][c] = val
-        print('Итоговая матрица:')
+        print('Введённая матрица:')
         self.draw_matrix_cmd()
 
     def draw_matrix_cmd(self, matrix: list[list] = None):
         if matrix is None:
             matrix = self.matrix
         first_none = True
-        # Сбор содержимого матрицы как строк
         formatted_grid = []
-        for row in self.matrix:
+        for row in matrix:
             formatted_row = []
             for val in row:
                 if val is not None:
@@ -115,14 +118,11 @@ class IO_Unit:
                     formatted_row.append('X' if first_none else 'O')
                     first_none = False
             formatted_grid.append(formatted_row)
-        # Вычисление ширины ячейки
         cell_width = max(
             len(cell) for row in formatted_grid for cell in row
         )
         cell_width = max(cell_width, 1) + 2
-        # Создание горизонтальных границ
         border = '+' + '+'.join(['-' * cell_width] * len(matrix[0])) + '+'
-        # Отрисовка матрицы в виде таблицы
         print(border)
         for row in formatted_grid:
             row_str = '|' + '|'.join(cell.center(cell_width)
@@ -213,6 +213,38 @@ class IO_Unit:
         print("Сгенерированный LaTeX-код:")
         print(latex_code)
         print("Скопируйте этот код для вставки в любой LaTeX-редактор")
+
+    def matrix_x_matrix_cmd(self):
+        matrix_a = [row[:] for row in self.matrix]
+        cols_a = self.cols
+
+        self.create_matrix_cmd()
+        matrix_b = self.matrix
+
+        if cols_a != self.rows:
+            print(f"Ошибка: Перемножение невозможно!")
+            print(
+                f"Число столбцов первой матрицы ({cols_a}) должно совпадать с числом строк второй матрицы ({self.rows})")
+            return
+
+        try:
+            result = matrix_x_matrix(matrix_a, matrix_b)
+            self.matrix = result
+            self.rows = len(result)
+            self.cols = len(result[0])
+            print("Результат перемножения матриц:")
+            self.draw_matrix_cmd()
+        except Exception as e:
+            print(f"В ходе перемножения матриц произошла ошибка: {e}")
+
+    def calculate_determinant_cmd(self):
+        print('Исходная матрица:')
+        self.draw_matrix_cmd()
+        try:
+            det = calculate_determinant(self.matrix)
+            print(f"Определитель матрицы det(A) = {det}")
+        except Exception as e:
+            print(f"При вычислении определителя произошла ошибка: {e}")
 
 
 unit = IO_Unit()
