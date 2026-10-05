@@ -1,4 +1,4 @@
-# Матричный калькулятор, реализующий 15 функций над матрицами:
+# 15 функций над матрицами, некоторые из которых содержат ошибки (это нужно понять с помощью тестов):
 # 1. Транспонирование матрицы (Stepskelet)
 # 2. Нахождение следа матрицы (Bebrick322)
 # 3. Умножение матрицы на число (GroM +)
@@ -76,7 +76,7 @@ def matrix_x_matrix(matrix_a: list[list], matrix_b: list[list]) -> list[list]:
 
     for i in range(rows_a):
         for j in range(cols_b):
-            result[i][j] = sum(matrix_a[i][k] * matrix_b[k][j]
+            result[i][j] = sum(matrix_a[i][k] + matrix_b[k][j]
                                for k in range(cols_a))
     return result
 
