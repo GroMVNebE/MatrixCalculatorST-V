@@ -104,7 +104,7 @@ def calculate_determinant(matrix: list[list]) -> float | int:
 
 def _validate_matrix(matrix: list[list], *, square: bool = False) -> tuple[int, int]:
     """
-    Проверяет, что объект является непустой прямоугольной числовой матрицей.
+    Проверяет, что объект является непустой прямоугольной числовой матрицей.\
 
     Возвращает:
         (количество строк, количество столбцов)
@@ -133,11 +133,11 @@ def _validate_matrix(matrix: list[list], *, square: bool = False) -> tuple[int, 
 
 def _normalize_number(value: Number, eps: float = 1e-12) -> Number:
     """
-    Убирает погрешности вычислений с плавающей точкой.
+    Убирает погрешности вычислений с плавающей точкой
 
     Например:
         2.0000000000000004 -> 2
-        1e-16              -> 0
+        1e-16 -> 0
     """
     if isinstance(value, float):
         if abs(value) < eps:
@@ -152,10 +152,7 @@ def _normalize_number(value: Number, eps: float = 1e-12) -> Number:
 
 def _matrix_multiply(matrix_a: list[list], matrix_b: list[list]) -> list[list]:
     """
-    Внутренняя функция перемножения матриц.
-
-    Если в matrix_func.py уже есть matrix_x_matrix, эту функцию всё равно
-    можно оставить: она делает matrix_power независимой от других реализаций.
+    Внутренняя функция перемножения матриц
     """
     rows_a, cols_a = _validate_matrix(matrix_a)
     rows_b, cols_b = _validate_matrix(matrix_b)
@@ -174,13 +171,11 @@ def _matrix_multiply(matrix_a: list[list], matrix_b: list[list]) -> list[list]:
         for row in range(rows_a)
     ]
 
-# Основные функции
-# 1. Транспонирование матрицы
 
 def transpose_matrix(matrix: list[list]) -> list[list]:
     """
-    Возвращает транспонированную матрицу.
-    Исходная матрица не изменяется.
+    Возвращает транспонированную матрицу
+    Исходная матрица не изменяется
     """
     rows, cols = _validate_matrix(matrix)
 
@@ -190,15 +185,12 @@ def transpose_matrix(matrix: list[list]) -> list[list]:
     ]
 
 
-
-# 5. Вычитание матриц
-
 def subtract_matrices(
     matrix_a: list[list],
     matrix_b: list[list]
 ) -> list[list]:
     """
-    Возвращает разность matrix_a - matrix_b.
+    Возвращает разность matrix_a - matrix_b
     """
     rows_a, cols_a = _validate_matrix(matrix_a)
     rows_b, cols_b = _validate_matrix(matrix_b)
@@ -217,25 +209,23 @@ def subtract_matrices(
     ]
 
 
-# 10. Решение СЛАУ методом Гаусса
-
 def solve_gaussian(
     coefficients: list[list],
     constants: list[Number],
     eps: float = 1e-12
 ) -> list[Number]:
     """
-    Решает систему A * x = b методом Гаусса с выбором главного элемента.
+    Решает систему A * x = b методом Гаусса с выбором главного элемента
 
     Аргументы:
-        coefficients — квадратная матрица коэффициентов A;
-        constants    — вектор свободных членов b;
-        eps          — точность сравнения с нулём.
+        coefficients — квадратная матрица коэффициентов A
+        constants — вектор свободных членов b
+        eps — точность сравнения с нулём
 
     Возвращает:
-        Список решений [x1, x2, ..., xn].
+        Список решений [x1, x2, ..., xn]
 
-    Выбрасывает ValueError, если система не имеет единственного решения.
+    Выбрасывает ValueError, если система не имеет единственного решения
     """
     rows, cols = _validate_matrix(coefficients, square=True)
 
@@ -248,14 +238,14 @@ def solve_gaussian(
     if any(not isinstance(value, Number) for value in constants):
         raise ValueError("Свободные члены должны быть числами")
 
-    # Создаём расширенную матрицу, не изменяя исходные данные.
+    # Создаём расширенную матрицу, не изменяя исходные данные
     augmented = [
         [float(value) for value in coefficients[row]]
         + [float(constants[row])]
         for row in range(rows)
     ]
 
-    # Прямой ход метода Гаусса.
+    # Прямой ход метода Гаусса
     for col in range(cols):
         pivot_row = max(
             range(col, rows),
@@ -276,11 +266,11 @@ def solve_gaussian(
 
         pivot = augmented[col][col]
 
-        # Нормализуем ведущую строку.
+        # Нормализуем ведущую строку
         for j in range(col, cols + 1):
             augmented[col][j] /= pivot
 
-        # Обнуляем элементы под ведущим.
+        # Обнуляем элементы под ведущим
         for row in range(col + 1, rows):
             factor = augmented[row][col]
 
@@ -291,7 +281,7 @@ def solve_gaussian(
             for j in range(col, cols + 1):
                 augmented[row][j] -= factor * augmented[col][j]
 
-    # Обратный ход.
+    # Обратный ход
     solution = [0.0] * rows
 
     for row in range(rows - 1, -1, -1):
@@ -303,16 +293,11 @@ def solve_gaussian(
     return [_normalize_number(value, eps) for value in solution]
 
 
-
-# 11. Возведение матрицы в степень
-
 def matrix_power(matrix: list[list], exponent: int) -> list[list]:
     """
-    Возводит квадратную матрицу в целую неотрицательную степень.
-
-    Используется быстрое возведение в степень.
-
-    Для exponent == 0 возвращается единичная матрица.
+    Возводит квадратную матрицу в целую неотрицательную степень  
+    Используется быстрое возведение в степень  
+    Для exponent == 0 возвращается единичная матрица
     """
     rows, cols = _validate_matrix(matrix, square=True)
 
@@ -344,18 +329,14 @@ def matrix_power(matrix: list[list], exponent: int) -> list[list]:
     return result
 
 
-
-# 13. Нахождение обратной матрицы
-
 def inverse_matrix(
     matrix: list[list],
     eps: float = 1e-12
 ) -> list[list]:
     """
-    Возвращает обратную матрицу методом Гаусса — Жордана.
-
-    Выбрасывает ValueError, если матрица вырождена.
-    Исходная матрица не изменяется.
+    Возвращает обратную матрицу методом Гаусса — Жордана  
+    Выбрасывает ValueError, если матрица вырождена  
+    Исходная матрица не изменяется
     """
     rows, cols = _validate_matrix(matrix, square=True)
     size = rows
@@ -392,11 +373,11 @@ def inverse_matrix(
 
         pivot = augmented[col][col]
 
-        # Делим ведущую строку на ведущий элемент.
+        # Делим ведущую строку на ведущий элемент
         for j in range(size * 2):
             augmented[col][j] /= pivot
 
-        # Обнуляем текущий столбец во всех остальных строках.
+        # Обнуляем текущий столбец во всех остальных строках
         for row in range(size):
             if row == col:
                 continue
