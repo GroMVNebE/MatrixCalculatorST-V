@@ -1,17 +1,17 @@
 # Матричный калькулятор, реализующий 15 функций над матрицами:
-# 1. Транспонирование матрицы (Stepskelet)
+# 1. Транспонирование матрицы (Stepskelet +)
 # 2. Нахождение следа матрицы (Bebrick322)
 # 3. Умножение матрицы на число (GroM +)
 # 4. Сложение матриц (Bebrick322)
-# 5. Вычитание матриц (Stepskelet)
+# 5. Вычитание матриц (Stepskelet +)
 # 6. Генератор матриц(единичная, нулевая, случайная, случайная-диагональная, случайная-симметричная) (GroM +)
 # 7. Экспорт в LaTeX (GroM +)
 # 8. Перемножение матриц (GroM +)
 # 9. Вычисление определителя (GroM +)
-# 10. Решение СЛАУ методом Гаусса (Stepskelet)
-# 11. Нахождение степеней матрицы (Stepskelet)
+# 10. Решение СЛАУ методом Гаусса (Stepskelet +)
+# 11. Нахождение степеней матрицы (Stepskelet +)
 # 12. Решение СЛАУ методом Крамера (Bebrick322)
-# 13. Нахождение обратной матрицы (Stepskelet)
+# 13. Нахождение обратной матрицы (Stepskelet +)
 # 14. Решение СЛАУ матричным методом (Bebrick322)
 # 15. LUP разложение матрицы (Bebrick322)
 
@@ -34,6 +34,18 @@ class IO_Unit:
                 'matrix_required': True},
             {'name': 'Вычислить определитель', 'command': self.calculate_determinant_cmd,
                 'matrix_required': True, 'is_square_matrix': True},
+
+            # Команды функций Степана
+            {'name': 'Транспонировать матрицу', 'command': self.transpose_matrix_cmd,
+              'matrix_required': True},
+            {'name': 'Вычесть матрицу', 'command': self.subtract_matrix_cmd,
+              'matrix_required': True},
+            {'name': 'Решить СЛАУ методом Гаусса', 'command': self.solve_gaussian_cmd,
+              'matrix_required': True, 'is_square_matrix': True},
+            {'name': 'Возвести матрицу в степень', 'command': self.matrix_power_cmd,
+              'matrix_required': True, 'is_square_matrix': True},
+            {'name': 'Найти обратную матрицу', 'command': self.inverse_matrix_cmd,
+             'matrix_required': True, 'is_square_matrix': True},
         ]
         self.matrix = None
         self.rows, self.cols = None, None
@@ -245,6 +257,141 @@ class IO_Unit:
             print(f"Определитель матрицы det(A) = {det}")
         except Exception as e:
             print(f"При вычислении определителя произошла ошибка: {e}")
+
+    # Интерфейс функций Степана
+
+    def _input_matrix_of_size(self, rows: int, cols: int, title: str) -> list[list]:
+        """
+        Вспомогательный интерфейсный метод
+
+        Считывает дополнительную матрицу, но не заменяет self.matrix  
+        Это важно для операций с двумя матрицами
+        """
+        print(title)
+        matrix = [[None] * cols for _ in range(rows)]
+
+        for row in range(rows):
+            for col in range(cols):
+                self.draw_matrix_cmd(matrix)
+                matrix[row][col] = self._prompt_int(
+                    f'Введите значение ячейки [{row + 1}, {col + 1}]: '
+                )
+
+        return matrix
+
+
+    def transpose_matrix_cmd(self):
+        """Интерфейс транспонирования матрицы"""
+        print('Исходная матрица:')
+        self.draw_matrix_cmd()
+
+        try:
+            result = transpose_matrix(self.matrix)
+
+            self.matrix = result
+            self.rows, self.cols = self.cols, self.rows
+
+            print('Транспонирование успешно выполнено. Результат:')
+            self.draw_matrix_cmd()
+        except (TypeError, ValueError) as error:
+            print(f'Не удалось транспонировать матрицу: {error}')
+
+
+    def subtract_matrix_cmd(self):
+        """Интерфейс вычитания из текущей матрицы другой матрицы"""
+        print('Первая матрица A:')
+        self.draw_matrix_cmd()
+
+        matrix_b = self._input_matrix_of_size(
+            self.rows,
+            self.cols,
+            'Введите матрицу B того же размера. Будет вычислено A - B.'
+        )
+
+        print('Вторая матрица B:')
+        self.draw_matrix_cmd(matrix_b)
+
+        try:
+            result = subtract_matrices(self.matrix, matrix_b)
+
+            self.matrix = result
+
+            print('Вычитание успешно выполнено. Результат A - B:')
+            self.draw_matrix_cmd()
+        except (TypeError, ValueError) as error:
+            print(f'Не удалось выполнить вычитание: {error}')
+
+
+    def solve_gaussian_cmd(self):
+        """
+        Интерфейс решения СЛАУ
+
+        Текущая матрица используется как матрица коэффициентов A  
+        Решение не заменяет текущую матрицу
+        """
+        print('Матрица коэффициентов системы A:')
+        self.draw_matrix_cmd()
+
+        constants = []
+
+        print('Введите столбец свободных членов b:')
+
+        for row in range(self.rows):
+            value = self._prompt_int(
+                f'b[{row + 1}] = '
+            )
+            constants.append(value)
+
+        try:
+            solution = solve_gaussian(self.matrix, constants)
+
+            print('Решение системы:')
+            for index, value in enumerate(solution, start=1):
+                print(f'x{index} = {value}')
+
+        except (TypeError, ValueError) as error:
+            print(f'Не удалось решить систему методом Гаусса: {error}')
+
+
+    def matrix_power_cmd(self):
+        """Интерфейс возведения матрицы в степень"""
+        print('Исходная матрица:')
+        self.draw_matrix_cmd()
+
+        exponent = self._prompt_int(
+            'Введите целую неотрицательную степень: ',
+            min_val=0
+        )
+
+        try:
+            result = matrix_power(self.matrix, exponent)
+
+            self.matrix = result
+            self.rows = len(result)
+            self.cols = len(result[0])
+
+            print(f'Матрица успешно возведена в степень {exponent}. Результат:')
+            self.draw_matrix_cmd()
+        except (TypeError, ValueError) as error:
+            print(f'Не удалось возвести матрицу в степень: {error}')
+
+
+    def inverse_matrix_cmd(self):
+        """Интерфейс нахождения обратной матрицы"""
+        print('Исходная матрица:')
+        self.draw_matrix_cmd()
+
+        try:
+            result = inverse_matrix(self.matrix)
+
+            self.matrix = result
+            self.rows = len(result)
+            self.cols = len(result[0])
+
+            print('Обратная матрица успешно найдена:')
+            self.draw_matrix_cmd()
+        except (TypeError, ValueError) as error:
+            print(f'Не удалось найти обратную матрицу: {error}')
 
 
 unit = IO_Unit()
