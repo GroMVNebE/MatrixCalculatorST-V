@@ -1,8 +1,8 @@
 # Матричный калькулятор, реализующий 15 функций над матрицами:
 # 1. Транспонирование матрицы (Stepskelet +)
-# 2. Нахождение следа матрицы (Bebrick322)
+# 2. Нахождение следа матрицы (Bebrick322 +)
 # 3. Умножение матрицы на число (GroM +)
-# 4. Сложение матриц (Bebrick322)
+# 4. Сложение матриц (Bebrick322 +)
 # 5. Вычитание матриц (Stepskelet +)
 # 6. Генератор матриц(единичная, нулевая, случайная, случайная-диагональная, случайная-симметричная) (GroM +)
 # 7. Экспорт в LaTeX (GroM +)
@@ -10,10 +10,10 @@
 # 9. Вычисление определителя (GroM +)
 # 10. Решение СЛАУ методом Гаусса (Stepskelet +)
 # 11. Нахождение степеней матрицы (Stepskelet +)
-# 12. Решение СЛАУ методом Крамера (Bebrick322)
+# 12. Решение СЛАУ методом Крамера (Bebrick322 +)
 # 13. Нахождение обратной матрицы (Stepskelet +)
-# 14. Решение СЛАУ матричным методом (Bebrick322)
-# 15. LUP разложение матрицы (Bebrick322)
+# 14. Решение СЛАУ матричным методом (Bebrick322 +)
+# 15. LUP разложение матрицы (Bebrick322 +)
 
 from matrix_func import *
 
@@ -33,6 +33,16 @@ class IO_Unit:
             {'name': 'Перемножить матрицы', 'command': self.matrix_x_matrix_cmd,
                 'matrix_required': True},
             {'name': 'Вычислить определитель', 'command': self.calculate_determinant_cmd,
+                'matrix_required': True, 'is_square_matrix': True},
+            {'name': 'Найти след матрицы', 'command': self.trace_cmd,
+                'matrix_required': True, 'is_square_matrix': True},
+            {'name': 'Сложить матрицы', 'command': self.add_matrices_cmd,
+                'matrix_required': True},
+            {'name': 'Решить СЛАУ методом Крамера', 'command': self.cramer_cmd,
+                'matrix_required': True, 'is_square_matrix': True},
+            {'name': 'Решить СЛАУ матричным методом', 'command': self.matrix_method_cmd,
+                'matrix_required': True, 'is_square_matrix': True},
+            {'name': 'LUP-разложение матрицы', 'command': self.lup_cmd,
                 'matrix_required': True, 'is_square_matrix': True},
 
             # Команды функций Степана
@@ -62,6 +72,15 @@ class IO_Unit:
                 return val
             except ValueError:
                 print('Некорректный ввод! Введите целое число')
+
+    def _prompt_vector(self, n: int, name: str = "b") -> list:
+        print(
+            f'Введите вектор {name} длины {n} (каждое значение — с новой строки):')
+        vector = []
+        for i in range(n):
+            val = self._prompt_int(f'{name}[{i + 1}] = ')
+            vector.append(val)
+        return vector
 
     def _validate_command(self, command: dict) -> bool:
         if command.get('matrix_required') is True and self.matrix is None:
@@ -258,6 +277,78 @@ class IO_Unit:
         except Exception as e:
             print(f"При вычислении определителя произошла ошибка: {e}")
 
+    def trace_cmd(self):
+        print('Исходная матрица:')
+        self.draw_matrix_cmd()
+        try:
+            tr = trace(self.matrix)
+            print(f"След матрицы tr(A) = {tr}")
+        except Exception as e:
+            print(f"При вычислении следа произошла ошибка: {e}")
+
+    def add_matrices_cmd(self):
+        matrix_a = [row[:] for row in self.matrix]
+        rows_a, cols_a = self.rows, self.cols
+
+        print('Введите вторую матрицу для сложения:')
+        self.create_matrix_cmd()
+        matrix_b = self.matrix
+
+        if rows_a != self.rows or cols_a != self.cols:
+            print("Ошибка: размеры матриц не совпадают!")
+            print(
+                f"Первая: {rows_a}x{cols_a}, вторая: {self.rows}x{self.cols}")
+            self.matrix = matrix_a
+            self.rows, self.cols = rows_a, cols_a
+            return
+
+        try:
+            result = add_matrices(matrix_a, matrix_b)
+            self.matrix = result
+            self.rows = len(result)
+            self.cols = len(result[0])
+            print("Результат сложения матриц:")
+            self.draw_matrix_cmd()
+        except Exception as e:
+            print(f"В ходе сложения матриц произошла ошибка: {e}")
+
+    def cramer_cmd(self):
+        print('Матрица системы:')
+        self.draw_matrix_cmd()
+        b = self._prompt_vector(self.rows, "b")
+        try:
+            x = solve_cramer(self.matrix, b)
+            print("Решение СЛАУ методом Крамера:")
+            for i, val in enumerate(x):
+                print(f"  x{i + 1} = {val}")
+        except Exception as e:
+            print(f"При решении СЛАУ методом Крамера произошла ошибка: {e}")
+
+    def matrix_method_cmd(self):
+        print('Матрица системы:')
+        self.draw_matrix_cmd()
+        b = self._prompt_vector(self.rows, "b")
+        try:
+            x = solve_matrix_method(self.matrix, b)
+            print("Решение СЛАУ матричным методом:")
+            for i, val in enumerate(x):
+                print(f"  x{i + 1} = {val}")
+        except Exception as e:
+            print(f"При решении СЛАУ матричным методом произошла ошибка: {e}")
+
+    def lup_cmd(self):
+        print('Исходная матрица:')
+        self.draw_matrix_cmd()
+        try:
+            L, U, P = lup_decomposition(self.matrix)
+            print("Матрица L (нижнетреугольная):")
+            self.draw_matrix_cmd(L)
+            print("Матрица U (верхнетреугольная):")
+            self.draw_matrix_cmd(U)
+            print("Матрица перестановок P:")
+            self.draw_matrix_cmd(P)
+        except Exception as e:
+            print(f"При LUP-разложении произошла ошибка: {e}")
     # Интерфейс функций Степана
 
     def _input_matrix_of_size(self, rows: int, cols: int, title: str) -> list[list]:
