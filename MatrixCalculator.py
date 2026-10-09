@@ -34,7 +34,6 @@ class IO_Unit:
                 'matrix_required': True},
             {'name': 'Вычислить определитель', 'command': self.calculate_determinant_cmd,
                 'matrix_required': True, 'is_square_matrix': True},
-            # ----- NEW: команды Bebrick322 (пункты 2, 4, 12, 14, 15) -----
             {'name': 'Найти след матрицы', 'command': self.trace_cmd,
                 'matrix_required': True, 'is_square_matrix': True},
             {'name': 'Сложить матрицы', 'command': self.add_matrices_cmd,
@@ -62,7 +61,6 @@ class IO_Unit:
             except ValueError:
                 print('Некорректный ввод! Введите целое число')
 
-    # ----- NEW: вспомогательный метод для ввода вектора b -----
     def _prompt_vector(self, n: int, name: str = "b") -> list:
         print(f'Введите вектор {name} длины {n} (каждое значение — с новой строки):')
         vector = []
@@ -266,12 +264,7 @@ class IO_Unit:
         except Exception as e:
             print(f"При вычислении определителя произошла ошибка: {e}")
 
-    # ================================================================
-    # NEW: методы Bebrick322 (пункты 2, 4, 12, 14, 15)
-    # ================================================================
-
     def trace_cmd(self):
-        """Пункт 2: нахождение следа матрицы."""
         print('Исходная матрица:')
         self.draw_matrix_cmd()
         try:
@@ -281,7 +274,6 @@ class IO_Unit:
             print(f"При вычислении следа произошла ошибка: {e}")
 
     def add_matrices_cmd(self):
-        """Пункт 4: сложение матриц."""
         matrix_a = [row[:] for row in self.matrix]
         rows_a, cols_a = self.rows, self.cols
 
@@ -308,7 +300,6 @@ class IO_Unit:
             print(f"В ходе сложения матриц произошла ошибка: {e}")
 
     def cramer_cmd(self):
-        """Пункт 12: решение СЛАУ методом Крамера."""
         print('Матрица системы:')
         self.draw_matrix_cmd()
         b = self._prompt_vector(self.rows, "b")
@@ -321,7 +312,6 @@ class IO_Unit:
             print(f"При решении СЛАУ методом Крамера произошла ошибка: {e}")
 
     def matrix_method_cmd(self):
-        """Пункт 14: решение СЛАУ матричным методом."""
         print('Матрица системы:')
         self.draw_matrix_cmd()
         b = self._prompt_vector(self.rows, "b")
@@ -334,7 +324,6 @@ class IO_Unit:
             print(f"При решении СЛАУ матричным методом произошла ошибка: {e}")
 
     def lup_cmd(self):
-        """Пункт 15: LUP-разложение матрицы."""
         print('Исходная матрица:')
         self.draw_matrix_cmd()
         try:

@@ -1,4 +1,42 @@
-# Функции Bebrick322: пункты 2, 4, 12, 14, 15 (ВЕРСИЯ С ОШИБКОЙ)
+# 15 функций над матрицами, некоторые из которых содержат ошибки (это нужно понять с помощью тестов):
+# 1. Транспонирование матрицы (Stepskelet)
+# 2. Нахождение следа матрицы (Bebrick322 +)
+# 3. Умножение матрицы на число (GroM +)
+# 4. Сложение матриц (Bebrick322 +)
+# 5. Вычитание матриц (Stepskelet)
+# 6. Генератор матриц(единичная, нулевая, случайная, случайная-диагональная, случайная-симметричная) (GroM +)
+# 7. Экспорт в LaTeX (GroM +)
+# 8. Перемножение матриц (GroM +)
+# 9. Вычисление определителя (GroM +)
+# 10. Решение СЛАУ методом Гаусса (Stepskelet)
+# 11. Нахождение степеней матрицы (Stepskelet)
+# 12. Решение СЛАУ методом Крамера (Bebrick322 +)
+# 13. Нахождение обратной матрицы (Stepskelet)
+# 14. Решение СЛАУ матричным методом (Bebrick322 +)
+# 15. LUP разложение матрицы (Bebrick322 +)
+
+import random
+
+
+def matrix_x_number(matrix: list[list], value: int) -> list[list]:
+    return [[cell * value for cell in row] for row in matrix]
+
+
+def generate_identity_matrix(n: int) -> list[list[int]]:
+    return [[1 if i == j else 0 for j in range(n)] for i in range(n)]
+
+
+def generate_zero_matrix(rows: int, cols: int) -> list[list[int]]:
+    return [[0 for _ in range(cols)] for _ in range(rows)]
+
+
+def generate_random_matrix(rows: int, cols: int, min_val: int = -100, max_val: int = 100) -> list[list[int]]:
+    return [[random.randint(min_val, max_val) for _ in range(cols)] for _ in range(rows)]
+
+
+def generate_random_diagonal_matrix(n: int, min_val: int = -100, max_val: int = 100) -> list[list[int]]:
+    matrix = [[0] * n for _ in range(n)]
+
 
 EPS = 1e-12
 
@@ -19,7 +57,6 @@ def add_matrices(matrix_a: list[list], matrix_b: list[list]) -> list[list]:
     cols = len(matrix_a[0])
     if any(len(row) != cols for row in matrix_a) or any(len(row) != cols for row in matrix_b):
         raise ValueError("Размеры матриц не совпадают")
-    # ОШИБКА: должно быть сложение, а не вычитание
     return [[matrix_a[i][j] - matrix_b[i][j] for j in range(cols)]
             for i in range(len(matrix_a))]
 
