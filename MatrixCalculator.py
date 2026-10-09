@@ -45,15 +45,15 @@ class IO_Unit:
             {'name': 'LUP-разложение матрицы', 'command': self.lup_cmd,
                 'matrix_required': True, 'is_square_matrix': True},
 
-            # Команды функций Степана
+            # Команды функций Stepskelet
             {'name': 'Транспонировать матрицу', 'command': self.transpose_matrix_cmd,
-              'matrix_required': True},
+             'matrix_required': True},
             {'name': 'Вычесть матрицу', 'command': self.subtract_matrix_cmd,
-              'matrix_required': True},
+             'matrix_required': True},
             {'name': 'Решить СЛАУ методом Гаусса', 'command': self.solve_gaussian_cmd,
-              'matrix_required': True, 'is_square_matrix': True},
+             'matrix_required': True, 'is_square_matrix': True},
             {'name': 'Возвести матрицу в степень', 'command': self.matrix_power_cmd,
-              'matrix_required': True, 'is_square_matrix': True},
+             'matrix_required': True, 'is_square_matrix': True},
             {'name': 'Найти обратную матрицу', 'command': self.inverse_matrix_cmd,
              'matrix_required': True, 'is_square_matrix': True},
         ]
@@ -256,6 +256,7 @@ class IO_Unit:
             print(f"Ошибка: Перемножение невозможно!")
             print(
                 f"Число столбцов первой матрицы ({cols_a}) должно совпадать с числом строк второй матрицы ({self.rows})")
+            self.matrix = matrix_a
             return
 
         try:
@@ -267,6 +268,7 @@ class IO_Unit:
             self.draw_matrix_cmd()
         except Exception as e:
             print(f"В ходе перемножения матриц произошла ошибка: {e}")
+            self.matrix = matrix_a
 
     def calculate_determinant_cmd(self):
         print('Исходная матрица:')
@@ -349,7 +351,7 @@ class IO_Unit:
             self.draw_matrix_cmd(P)
         except Exception as e:
             print(f"При LUP-разложении произошла ошибка: {e}")
-    # Интерфейс функций Степана
+    # Интерфейс функций Stepskelet
 
     def _input_matrix_of_size(self, rows: int, cols: int, title: str) -> list[list]:
         """
@@ -370,7 +372,6 @@ class IO_Unit:
 
         return matrix
 
-
     def transpose_matrix_cmd(self):
         """Интерфейс транспонирования матрицы"""
         print('Исходная матрица:')
@@ -386,7 +387,6 @@ class IO_Unit:
             self.draw_matrix_cmd()
         except (TypeError, ValueError) as error:
             print(f'Не удалось транспонировать матрицу: {error}')
-
 
     def subtract_matrix_cmd(self):
         """Интерфейс вычитания из текущей матрицы другой матрицы"""
@@ -411,7 +411,6 @@ class IO_Unit:
             self.draw_matrix_cmd()
         except (TypeError, ValueError) as error:
             print(f'Не удалось выполнить вычитание: {error}')
-
 
     def solve_gaussian_cmd(self):
         """
@@ -443,7 +442,6 @@ class IO_Unit:
         except (TypeError, ValueError) as error:
             print(f'Не удалось решить систему методом Гаусса: {error}')
 
-
     def matrix_power_cmd(self):
         """Интерфейс возведения матрицы в степень"""
         print('Исходная матрица:')
@@ -461,11 +459,11 @@ class IO_Unit:
             self.rows = len(result)
             self.cols = len(result[0])
 
-            print(f'Матрица успешно возведена в степень {exponent}. Результат:')
+            print(
+                f'Матрица успешно возведена в степень {exponent}. Результат:')
             self.draw_matrix_cmd()
         except (TypeError, ValueError) as error:
             print(f'Не удалось возвести матрицу в степень: {error}')
-
 
     def inverse_matrix_cmd(self):
         """Интерфейс нахождения обратной матрицы"""

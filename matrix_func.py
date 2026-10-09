@@ -18,7 +18,7 @@
 import random
 from numbers import Number
 
-# Функции Егора
+# Функции GroM
 
 def matrix_x_number(matrix: list[list], value: int) -> list[list]:
     return [[cell * value for cell in row] for row in matrix]
@@ -254,7 +254,7 @@ def solve_matrix_method(matrix_a: list[list], vector_b: list) -> list[float]:
 
     inv = _inverse_matrix(matrix_a)
     return [sum(inv[i][j] * vector_b[j] for j in range(n)) for i in range(n)]
-# Функции Степана
+# Функции Stepskelet
 
 # Вспоммогательные функции
 
