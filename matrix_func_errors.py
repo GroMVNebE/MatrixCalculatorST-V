@@ -1,5 +1,5 @@
 # 15 функций над матрицами, некоторые из которых содержат ошибки (это нужно понять с помощью тестов):
-# 1. Транспонирование матрицы (Stepskelet)
+# 1. Транспонирование матрицы (Stepskelet +)
 # 2. Нахождение следа матрицы (Bebrick322 +)
 # 3. Умножение матрицы на число (GroM +)
 # 4. Сложение матриц (Bebrick322 +)
@@ -8,10 +8,10 @@
 # 7. Экспорт в LaTeX (GroM +)
 # 8. Перемножение матриц (GroM +)
 # 9. Вычисление определителя (GroM +)
-# 10. Решение СЛАУ методом Гаусса (Stepskelet)
-# 11. Нахождение степеней матрицы (Stepskelet)
+# 10. Решение СЛАУ методом Гаусса (Stepskelet +)
+# 11. Нахождение степеней матрицы (Stepskelet +)
 # 12. Решение СЛАУ методом Крамера (Bebrick322 +)
-# 13. Нахождение обратной матрицы (Stepskelet)
+# 13. Нахождение обратной матрицы (Stepskelet +)
 # 14. Решение СЛАУ матричным методом (Bebrick322 +)
 # 15. LUP разложение матрицы (Bebrick322 +)
 
@@ -162,7 +162,7 @@ def solve_cramer(matrix_a: list[list], vector_b: list) -> list[float]:
     return x
 
 
-def inverse_matrix(matrix_a: list[list]) -> list[list]:
+def _inverse_matrix(matrix_a: list[list]) -> list[list]:
     n = len(matrix_a)
     if n == 0 or any(len(row) != n for row in matrix_a):
         raise ValueError("Матрица должна быть квадратной и непустой")
@@ -186,13 +186,14 @@ def solve_matrix_method(matrix_a: list[list], vector_b: list) -> list[float]:
     if len(vector_b) != n:
         raise ValueError("Вектор b должен иметь длину n")
 
-    inv = inverse_matrix(matrix_a)
+    inv = _inverse_matrix(matrix_a)
     return [sum(inv[i][j] * vector_b[j] for j in range(n)) for i in range(n)]
     return det
 
 # Функции Степана
 
 # Вспоммогательные функции
+
 
 def _validate_matrix(matrix: list[list], *, square: bool = False) -> tuple[int, int]:
     """
@@ -490,4 +491,3 @@ def inverse_matrix(
         ]
         for row in range(size)
     ]
-
